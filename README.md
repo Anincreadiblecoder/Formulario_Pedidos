@@ -8,6 +8,7 @@ Este é um sistema completo de formulário de pedidos desenvolvido para automati
 
 ### ✅ **Funcionalidades Implementadas**
 
+- **🔍 NOVO: Pesquisa Parcial (Search-as-you-type)**: Comboboxes inteligentes para todos os campos de seleção
 - **Preenchimento Automático**: Dados de alunos, clientes, produtos e lojas preenchidos automaticamente
 - **Validação Inteligente**: Campos obrigatórios, formatos de email, CPF, telefone
 - **Cálculos Automáticos**: Valores totais calculados em tempo real
@@ -18,18 +19,19 @@ Este é um sistema completo de formulário de pedidos desenvolvido para automati
 - **Tratamento de Dados Sujos**: Validação e limpeza automática de dados inconsistentes
 - **Notificação de Erros**: Alertas automáticos por email para desenvolvedores
 - **Fallback Robusto**: Funciona mesmo quando API não está disponível
-- **🔍 NOVO: Pesquisa de Pedidos**: Sistema completo para pesquisar pedidos por aluno com filtros avançados
+- **🔍 Pesquisa de Pedidos**: Sistema completo para pesquisar pedidos por aluno com filtros avançados
 
 ### 🔧 **Arquitetura do Sistema**
 
 ```
 formulario_pedidos/
 ├── index.html              # Interface principal do formulário
-├── pesquisar_pedidos.html  # NOVO: Página de pesquisa de pedidos
+├── pesquisar_pedidos.html  # Página de pesquisa de pedidos
 ├── styles.css              # Estilos responsivos
-├── pesquisa_styles.css     # NOVO: Estilos específicos para pesquisa
-├── script_api.js           # Lógica JavaScript com integração API
-├── pesquisa_pedidos.js     # NOVO: JavaScript para funcionalidade de pesquisa
+├── pesquisa_styles.css     # Estilos específicos para pesquisa
+├── script_api.js           # Lógica JavaScript com integração API (ATUALIZADO)
+├── combobox.js             # NOVO: Sistema de comboboxes com pesquisa parcial
+├── pesquisa_pedidos.js     # JavaScript para funcionalidade de pesquisa
 ├── backend_excel/          # Backend Flask para integração Excel
 │   ├── src/
 │   │   ├── main.py         # Servidor Flask principal
@@ -332,5 +334,3 @@ Desenvolvido com tecnologias open-source.
 **Desenvolvedor**: Sistema Manus  
 **Contato**: epav.2025@germinare.org.br
 
-#   F o r m u l a r i o _ P e d i d o s  
- 

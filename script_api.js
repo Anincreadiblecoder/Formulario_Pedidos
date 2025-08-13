@@ -332,64 +332,22 @@ async function initializeForm() {
     }
 }
 
-// Popular dropdown de clientes
+// Popular combobox de clientes
 function populateClientesDropdown(clientes) {
-    const select = document.getElementById('nomeCliente');
-    if (!select) return;
-
-    // Limpar opções existentes (exceto a primeira)
-    while (select.children.length > 1) {
-        select.removeChild(select.lastChild);
-    }
-
-    // Adicionar clientes
-    clientes.forEach(cliente => {
-        if (cliente.nome) {
-            const option = document.createElement('option');
-            option.value = cliente.nome;
-            option.textContent = cliente.nome;
-            select.appendChild(option);
-        }
-    });
+    // Usar o novo sistema de combobox
+    window.ComboboxUtils.createClienteCombobox(clientes);
 }
 
-// Popular dropdown de lojas
+// Popular combobox de lojas
 function populateLojaDropdown(lojas) {
-    const select = document.getElementById('loja-retirada');
-    if (!select) return;
-
-    // Limpar opções existentes (exceto a primeira)
-    while (select.children.length > 1) {
-        select.removeChild(select.lastChild);
-    }
-
-    // Adicionar lojas
-    lojas.forEach(loja => {
-        if (loja.nome) {
-            const option = document.createElement('option');
-            option.value = loja.nome;
-            option.textContent = loja.nome;
-            select.appendChild(option);
-        }
-    });
+    // Usar o novo sistema de combobox
+    window.ComboboxUtils.createLojaCombobox(lojas);
 }
 
-// Popular dropdown de produtos em um item
-function populateProdutoDropdown(selectElement, produtos) {
-    // Limpar opções existentes (exceto a primeira)
-    while (selectElement.children.length > 1) {
-        selectElement.removeChild(selectElement.lastChild);
-    }
-
-    // Adicionar produtos
-    produtos.forEach(produto => {
-        if (produto.nome) {
-            const option = document.createElement('option');
-            option.value = produto.nome;
-            option.textContent = produto.nome;
-            selectElement.appendChild(option);
-        }
-    });
+// Popular combobox de produtos em um item
+function populateProdutoDropdown(container, produtos) {
+    // Usar o novo sistema de combobox
+    window.ComboboxUtils.createProdutoCombobox(container, produtos);
 }
 
 // Configurar event listeners
@@ -408,10 +366,10 @@ function setupEventListeners() {
         });
     }
 
-    // Seleção de cliente
-    const clienteSelect = document.getElementById('nomeCliente');
-    if (clienteSelect) {
-        clienteSelect.addEventListener('change', function() {
+    // Seleção de cliente - agora usando combobox
+    const clienteInput = document.getElementById('nomeCliente');
+    if (clienteInput) {
+        clienteInput.addEventListener('change', function() {
             if (this.value && this.value !== 'Selecione um cliente') {
                 buscarEPreencherCliente(this.value);
             }
@@ -419,10 +377,10 @@ function setupEventListeners() {
     }
 
     // Tipo de entrega
-    const tipoEntregaRadios = document.querySelectorAll('input[name="tipoEntrega"]');
-    tipoEntregaRadios.forEach(radio => {
-        radio.addEventListener('change', toggleEntregaFields);
-    });
+    const tipoEntregaSelect = document.getElementById('tipoEntrega');
+    if (tipoEntregaSelect) {
+        tipoEntregaSelect.addEventListener('change', toggleEntregaFields);
+    }
 
     // Botão adicionar item
     const addItemBtn = document.getElementById('adicionarItem');
@@ -431,7 +389,7 @@ function setupEventListeners() {
     }
 
     // Botões do formulário
-    const limparBtn = document.getElementById('limparFormulario');
+    const limparBtn = document.getElementById('limparForm');
     const enviarBtn = document.getElementById('enviarPedido');
     
     if (limparBtn) {
@@ -540,21 +498,17 @@ async function buscarEPreencherCliente(nome) {
 
 // Toggle campos de entrega
 function toggleEntregaFields() {
-    const tipoEntrega = document.querySelector('input[name="tipo-entrega"]:checked')?.value;
-    const lojaField = document.getElementById('loja-field');
-    const enderecoField = document.getElementById('endereco-field');
-
-    if (!lojaField || !enderecoField) return;
-
-    if (tipoEntrega === 'retirada') {
-        lojaField.style.display = 'block';
-        enderecoField.style.display = 'none';
-    } else if (tipoEntrega === 'entrega') {
-        lojaField.style.display = 'none';
-        enderecoField.style.display = 'block';
+    const tipoEntregaSelect = document.getElementById('tipoEntrega');
+    const lojaGroup = document.getElementById('lojaRetiradaGroup');
+    
+    if (!tipoEntregaSelect || !lojaGroup) return;
+    
+    const tipoEntrega = tipoEntregaSelect.value;
+    
+    if (tipoEntrega === 'retirada_outras_lojas' || tipoEntrega === 'retirada_mercado_jf') {
+        lojaGroup.style.display = 'block';
     } else {
-        lojaField.style.display = 'none';
-        enderecoField.style.display = 'none';
+        lojaGroup.style.display = 'none';
     }
 }
 
@@ -563,321 +517,322 @@ function adicionarItem() {
     formState.itemCounter++;
     const itemId = formState.itemCounter;
     
-    const itemHtml = `
-        <div class="item-pedido" id="item-${itemId}">
-            <div class="item-header">
-                <h4>Item ${itemId}</h4>
-                <button type="button" class="btn-remover" onclick="removerItem(${itemId})">Remover Item</button>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="produto-${itemId}">Nome do Produto: *</label>
-                    <select id="produto-${itemId}" required>
-                        <option value="">Selecione um produto</option>
-                    </select>
-                </div>
-                
-                <div class="form-group">
-                    <label>Há promoção?</label>
-                    <div class="radio-group">
-                        <label><input type="radio" name="promocao-${itemId}" value="sim"> Sim</label>
-                        <label><input type="radio" name="promocao-${itemId}" value="nao" checked> Não</label>
-                    </div>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="quantidade-${itemId}">Quantidade: *</label>
-                    <input type="number" id="quantidade-${itemId}" min="1" required>
-                </div>
-                
-                <div class="form-group">
-                    <label for="peso-${itemId}">Peso:</label>
-                    <input type="text" id="peso-${itemId}" readonly>
-                </div>
-            </div>
-            
-            <div class="form-row">
-                <div class="form-group">
-                    <label for="preco-${itemId}">Preço Unitário:</label>
-                    <input type="text" id="preco-${itemId}" readonly>
-                </div>
-                
-                <div class="form-group">
-                    <label for="valor-item-${itemId}">Valor Total do Item:</label>
-                    <input type="text" id="valor-item-${itemId}" readonly>
-                </div>
-            </div>
-        </div>
-    `;
+    // Usar o template HTML
+    const template = document.getElementById('itemTemplate');
+    if (!template) {
+        console.error('Template de item não encontrado');
+        return;
+    }
     
+    const itemElement = template.content.cloneNode(true);
+    
+    // Atualizar número do item
+    const itemNumero = itemElement.querySelector('.item-numero');
+    if (itemNumero) {
+        itemNumero.textContent = itemId;
+    }
+    
+    // Configurar IDs únicos
+    const itemDiv = itemElement.querySelector('.item-pedido');
+    if (itemDiv) {
+        itemDiv.id = `item-${itemId}`;
+    }
+    
+    // Configurar combobox de produto
+    const produtoCombobox = itemElement.querySelector('.produto-combobox');
+    if (produtoCombobox) {
+        produtoCombobox.id = `produto-combobox-${itemId}`;
+    }
+    
+    // Configurar inputs com IDs únicos
+    const inputs = itemElement.querySelectorAll('input, select');
+    inputs.forEach(input => {
+        if (input.name === 'promocao') {
+            input.name = `promocao-${itemId}`;
+        }
+    });
+    
+    // Adicionar ao container
     const itensContainer = document.getElementById('itensContainer');
     if (itensContainer) {
-        itensContainer.insertAdjacentHTML('beforeend', itemHtml);
+        itensContainer.appendChild(itemElement);
         
-        // Popular dropdown de produtos
-        const produtoSelect = document.getElementById(`produto-${itemId}`);
-        if (produtoSelect && window.produtosDisponiveis) {
-            populateProdutoDropdown(produtoSelect, window.produtosDisponiveis);
+        // Configurar combobox de produtos após adicionar ao DOM
+        if (window.produtosDisponiveis && produtoCombobox) {
+            populateProdutoDropdown(produtoCombobox, window.produtosDisponiveis);
         }
         
         // Configurar event listeners do item
         setupItemEventListeners(itemId);
-        
-        messageSystem.success(`Item ${itemId} adicionado ao pedido.`);
     }
+    
+    messageSystem.success(`Item ${itemId} adicionado com sucesso!`);
 }
 
-// Configurar event listeners de um item
+// Configurar event listeners para um item específico
 function setupItemEventListeners(itemId) {
-    const produtoSelect = document.getElementById(`produto-${itemId}`);
-    const quantidadeInput = document.getElementById(`quantidade-${itemId}`);
+    const itemContainer = document.getElementById(`item-${itemId}`);
+    if (!itemContainer) return;
     
-    if (produtoSelect) {
-        produtoSelect.addEventListener('change', () => preencherDadosProduto(itemId));
+    // Botão remover item
+    const removeBtn = itemContainer.querySelector('.btn-remove');
+    if (removeBtn) {
+        removeBtn.addEventListener('click', () => removerItem(itemId));
     }
     
+    // Input de quantidade - calcular valor total
+    const quantidadeInput = itemContainer.querySelector('.quantidade-input');
     if (quantidadeInput) {
-        quantidadeInput.addEventListener('input', () => calcularValorItem(itemId));
+        quantidadeInput.addEventListener('input', () => {
+            calcularValorTotalItem(itemId);
+        });
     }
 }
 
-// Preencher dados do produto selecionado
-async function preencherDadosProduto(itemId) {
-    const produtoSelect = document.getElementById(`produto-${itemId}`);
-    const pesoInput = document.getElementById(`peso-${itemId}`);
-    const precoInput = document.getElementById(`preco-${itemId}`);
-    
-    if (!produtoSelect || !produtoSelect.value) return;
-    
-    try {
-        const produto = await dataLoader.buscarProduto(produtoSelect.value);
-        if (produto) {
-            if (pesoInput) pesoInput.value = produto.peso || '';
-            if (precoInput) precoInput.value = `R$ ${produto.preco.toFixed(2).replace('.', ',')}`;
-            
-            // Recalcular valor do item
-            calcularValorItem(itemId);
-        }
-    } catch (error) {
-        console.error('Erro ao buscar produto:', error);
-    }
-}
-
-// Calcular valor total do item
-function calcularValorItem(itemId) {
-    const quantidadeInput = document.getElementById(`quantidade-${itemId}`);
-    const precoInput = document.getElementById(`preco-${itemId}`);
-    const valorItemInput = document.getElementById(`valor-item-${itemId}`);
-    
-    if (!quantidadeInput || !precoInput || !valorItemInput) return;
-    
-    const quantidade = parseInt(quantidadeInput.value) || 0;
-    const precoText = precoInput.value.replace('R$ ', '').replace(',', '.');
-    const preco = parseFloat(precoText) || 0;
-    
-    const valorTotal = quantidade * preco;
-    valorItemInput.value = `R$ ${valorTotal.toFixed(2).replace('.', ',')}`;
-    
-    // Recalcular valor total do pedido
-    calcularValorTotalPedido();
-}
-
-// Calcular valor total do pedido
-function calcularValorTotalPedido() {
-    let total = 0;
-    const itens = document.querySelectorAll('.item-pedido');
-    
-    itens.forEach(item => {
-        const valorItemInput = item.querySelector('[id^="valor-item-"]');
-        if (valorItemInput && valorItemInput.value) {
-            const valor = parseFloat(valorItemInput.value.replace('R$ ', '').replace(',', '.')) || 0;
-            total += valor;
-        }
-    });
-    
-    const valorTotalInput = document.getElementById('valor-total');
-    if (valorTotalInput) {
-        valorTotalInput.value = `R$ ${total.toFixed(2).replace('.', ',')}`;
-    }
-}
-
-// Remover item
+// Remover item do pedido
 function removerItem(itemId) {
     const itemElement = document.getElementById(`item-${itemId}`);
     if (itemElement) {
         itemElement.remove();
-        calcularValorTotalPedido();
-        messageSystem.info(`Item ${itemId} removido do pedido.`);
+        
+        // Remover do array de itens
+        formState.itens = formState.itens.filter(item => item.id !== itemId);
+        
+        // Recalcular valor total
+        calcularValorTotal();
+        
+        messageSystem.success(`Item ${itemId} removido com sucesso!`);
     }
+}
+
+// Calcular valor total de um item específico
+function calcularValorTotalItem(itemId) {
+    const itemContainer = document.getElementById(`item-${itemId}`);
+    if (!itemContainer) return;
+    
+    const quantidadeInput = itemContainer.querySelector('.quantidade-input');
+    const precoInput = itemContainer.querySelector('.preco-input');
+    const valorTotalInput = itemContainer.querySelector('.valor-total-item');
+    
+    if (!quantidadeInput || !precoInput || !valorTotalInput) return;
+    
+    const quantidade = parseInt(quantidadeInput.value) || 0;
+    const precoText = precoInput.value.replace('R$', '').replace(',', '.').trim();
+    const preco = parseFloat(precoText) || 0;
+    
+    const valorTotal = quantidade * preco;
+    valorTotalInput.value = `R$ ${valorTotal.toFixed(2).replace('.', ',')}`;
+    
+    // Recalcular valor total do pedido
+    calcularValorTotal();
+}
+
+// Calcular valor total do pedido
+function calcularValorTotal() {
+    let valorTotal = 0;
+    
+    const itens = document.querySelectorAll('.item-pedido');
+    itens.forEach(item => {
+        const valorTotalInput = item.querySelector('.valor-total-item');
+        if (valorTotalInput && valorTotalInput.value) {
+            const valor = parseFloat(
+                valorTotalInput.value
+                    .replace('R$', '')
+                    .replace(',', '.')
+                    .trim()
+            ) || 0;
+            valorTotal += valor;
+        }
+    });
+    
+    const valorTotalPedidoInput = document.getElementById('valorTotalPedido');
+    if (valorTotalPedidoInput) {
+        valorTotalPedidoInput.value = `R$ ${valorTotal.toFixed(2).replace('.', ',')}`;
+    }
+    
+    formState.valorTotal = valorTotal;
 }
 
 // Limpar formulário
 function limparFormulario() {
-    if (confirm('Tem certeza que deseja limpar todos os dados do formulário?')) {
-        document.getElementById('pedido-form').reset();
+    if (confirm('Tem certeza que deseja limpar todo o formulário?')) {
+        document.getElementById('pedidoForm').reset();
         
         // Limpar itens
-        const itensContainer = document.getElementById('itens-container');
+        const itensContainer = document.getElementById('itensContainer');
         if (itensContainer) {
             itensContainer.innerHTML = '';
         }
         
-        // Resetar estado
-        formState = {
-            itens: [],
-            itemCounter: 0,
-            valorTotal: 0
-        };
+        // Limpar comboboxes
+        const clienteCombobox = window.comboboxManager.instances.get('clienteCombobox');
+        if (clienteCombobox) {
+            clienteCombobox.clear();
+        }
         
-        // Resetar campos de entrega
-        toggleEntregaFields();
+        const lojaCombobox = window.comboboxManager.instances.get('lojaCombobox');
+        if (lojaCombobox) {
+            lojaCombobox.clear();
+        }
+        
+        // Reset estado
+        formState.itens = [];
+        formState.itemCounter = 0;
+        formState.valorTotal = 0;
         
         messageSystem.success('Formulário limpo com sucesso!');
     }
 }
 
-// Validar formulário
-function validarFormulario() {
-    const erros = [];
-    
-    // Validar campos obrigatórios
-    const camposObrigatorios = [
-        { id: 'cliente-nome', nome: 'Nome do cliente' },
-        { id: 'cliente-email', nome: 'Email do cliente' },
-        { id: 'cliente-cpf', nome: 'CPF do cliente' }
-    ];
-    
-    camposObrigatorios.forEach(campo => {
-        const elemento = document.getElementById(campo.id);
-        if (!elemento || !elemento.value || elemento.value === 'Selecione um cliente') {
-            erros.push(`${campo.nome} é obrigatório.`);
-        }
-    });
-    
-    // Validar tipo de entrega
-    const tipoEntrega = document.querySelector('input[name="tipo-entrega"]:checked');
-    if (!tipoEntrega) {
-        erros.push('Tipo de entrega é obrigatório.');
-    }
-    
-    // Validar forma de pagamento
-    const formaPagamento = document.getElementById('forma-pagamento');
-    if (!formaPagamento || !formaPagamento.value || formaPagamento.value === 'Selecione a forma de pagamento') {
-        erros.push('Forma de pagamento é obrigatório.');
-    }
-    
-    // Validar itens
-    const itens = document.querySelectorAll('.item-pedido');
-    if (itens.length === 0) {
-        erros.push('Adicione pelo menos um item ao pedido.');
-    }
-    
-    // Validar cada item
-    itens.forEach((item, index) => {
-        const produtoSelect = item.querySelector('[id^="produto-"]');
-        const quantidadeInput = item.querySelector('[id^="quantidade-"]');
-        
-        if (!produtoSelect || !produtoSelect.value) {
-            erros.push(`Item ${index + 1}: Selecione um produto.`);
-        }
-        
-        if (!quantidadeInput || !quantidadeInput.value || quantidadeInput.value <= 0) {
-            erros.push(`Item ${index + 1}: Quantidade deve ser maior que zero.`);
-        }
-    });
-    
-    return erros;
-}
-
-// Coletar dados do formulário
-function coletarDadosFormulario() {
-    const dados = {
-        aluno: {
-            sala: document.getElementById('aluno-sala')?.value || '',
-            nome: document.getElementById('aluno-nome')?.value || '',
-            email: document.getElementById('aluno-email')?.value || ''
-        },
-        cliente: {
-            nome: document.getElementById('cliente-nome')?.value || '',
-            email: document.getElementById('cliente-email')?.value || '',
-            cpf: document.getElementById('cliente-cpf')?.value || '',
-            telefone: document.getElementById('cliente-telefone')?.value || ''
-        },
-        entrega: {
-            tipo: document.querySelector('input[name="tipo-entrega"]:checked')?.value || '',
-            loja: document.getElementById('loja-retirada')?.value || '',
-            endereco: document.getElementById('endereco-completo')?.value || '',
-            data: document.getElementById('data-entrega')?.value || '',
-            condicao: document.getElementById('condicao-entrega')?.value || ''
-        },
-        pagamento: {
-            forma: document.getElementById('forma-pagamento')?.value || ''
-        },
-        itens: [],
-        valorTotal: document.getElementById('valor-total')?.value || '',
-        observacoes: document.getElementById('observacoes')?.value || ''
-    };
-    
-    // Coletar itens
-    const itens = document.querySelectorAll('.item-pedido');
-    itens.forEach(item => {
-        const itemId = item.id.replace('item-', '');
-        const itemData = {
-            produto: document.getElementById(`produto-${itemId}`)?.value || '',
-            promocao: document.querySelector(`input[name="promocao-${itemId}"]:checked`)?.value || '',
-            quantidade: document.getElementById(`quantidade-${itemId}`)?.value || '',
-            peso: document.getElementById(`peso-${itemId}`)?.value || '',
-            preco: document.getElementById(`preco-${itemId}`)?.value || '',
-            valorTotal: document.getElementById(`valor-item-${itemId}`)?.value || ''
-        };
-        dados.itens.push(itemData);
-    });
-    
-    return dados;
-}
-
 // Enviar pedido
-async function enviarPedido() {
+async function enviarPedido(e) {
+    e.preventDefault();
+    
     try {
         // Validar formulário
-        const erros = validarFormulario();
-        if (erros.length > 0) {
-            messageSystem.error(`Corrija os seguintes erros: ${erros.join(' ')}`);
+        if (!validarFormulario()) {
             return;
         }
         
-        // Coletar dados
+        // Coletar dados do formulário
         const dadosPedido = coletarDadosFormulario();
         
-        // Mostrar loading
-        messageSystem.info('Enviando pedido...');
-        
-        // Enviar para API
-        const resultado = await dataLoader.salvarPedido(dadosPedido);
-        
-        if (resultado.success) {
-            messageSystem.success(`Pedido enviado com sucesso! ID: ${resultado.id_pedido}`);
+        // Tentar salvar via API
+        try {
+            const resultado = await dataLoader.salvarPedido(dadosPedido);
+            messageSystem.success('Pedido enviado com sucesso!');
             
             // Limpar formulário após sucesso
             setTimeout(() => {
                 limparFormulario();
             }, 2000);
-        } else {
-            messageSystem.error('Erro ao enviar pedido. Tente novamente.');
+            
+        } catch (apiError) {
+            console.warn('Erro ao salvar via API, salvando localmente:', apiError);
+            
+            // Fallback: salvar no localStorage
+            const pedidosLocais = JSON.parse(localStorage.getItem('pedidos') || '[]');
+            dadosPedido.id = `PED_${Date.now()}`;
+            dadosPedido.dataHora = new Date().toISOString();
+            pedidosLocais.push(dadosPedido);
+            localStorage.setItem('pedidos', JSON.stringify(pedidosLocais));
+            
+            messageSystem.warning('Pedido salvo localmente. Será sincronizado quando a conexão for restabelecida.');
         }
         
     } catch (error) {
         console.error('Erro ao enviar pedido:', error);
-        messageSystem.error(`Erro ao enviar pedido: ${error.message}`);
+        messageSystem.error('Erro ao enviar pedido. Tente novamente.');
     }
 }
 
-// Inicializar quando a página carregar
-document.addEventListener('DOMContentLoaded', initializeForm);
+// Validar formulário
+function validarFormulario() {
+    const camposObrigatorios = [
+        { id: 'nomeCliente', nome: 'Nome do cliente' },
+        { id: 'emailCliente', nome: 'Email do cliente' },
+        { id: 'cpfCliente', nome: 'CPF do cliente' },
+        { id: 'telefoneCliente', nome: 'Telefone do cliente' },
+        { id: 'tipoEntrega', nome: 'Tipo de entrega' },
+        { id: 'formaPagamento', nome: 'Forma de pagamento' }
+    ];
+    
+    for (const campo of camposObrigatorios) {
+        const elemento = document.getElementById(campo.id);
+        if (!elemento || !elemento.value.trim()) {
+            messageSystem.error(`Campo obrigatório não preenchido: ${campo.nome}`);
+            elemento?.focus();
+            return false;
+        }
+    }
+    
+    // Validar se há pelo menos um item
+    const itens = document.querySelectorAll('.item-pedido');
+    if (itens.length === 0) {
+        messageSystem.error('Adicione pelo menos um item ao pedido.');
+        return false;
+    }
+    
+    // Validar itens
+    for (let i = 0; i < itens.length; i++) {
+        const item = itens[i];
+        const produtoInput = item.querySelector('.produto-input');
+        const quantidadeInput = item.querySelector('.quantidade-input');
+        
+        if (!produtoInput?.value.trim()) {
+            messageSystem.error(`Selecione um produto para o item ${i + 1}.`);
+            produtoInput?.focus();
+            return false;
+        }
+        
+        if (!quantidadeInput?.value || parseInt(quantidadeInput.value) < 1) {
+            messageSystem.error(`Informe uma quantidade válida para o item ${i + 1}.`);
+            quantidadeInput?.focus();
+            return false;
+        }
+    }
+    
+    return true;
+}
 
-// Expor funções globais necessárias
-window.removerItem = removerItem;
+// Coletar dados do formulário
+function coletarDadosFormulario() {
+    const dados = {
+        // Dados do aluno
+        aluno: {
+            sala: document.getElementById('salaAluno')?.value || '',
+            nome: document.getElementById('nomeAluno')?.value || '',
+            email: document.getElementById('emailAluno')?.value || ''
+        },
+        
+        // Dados do cliente
+        cliente: {
+            nome: document.getElementById('nomeCliente')?.value || '',
+            email: document.getElementById('emailCliente')?.value || '',
+            cpf: document.getElementById('cpfCliente')?.value || '',
+            telefone: document.getElementById('telefoneCliente')?.value || ''
+        },
+        
+        // Dados de entrega
+        entrega: {
+            tipo: document.getElementById('tipoEntrega')?.value || '',
+            loja: document.getElementById('lojaRetirada')?.value || '',
+            endereco: document.getElementById('enderecoCompleto')?.value || '',
+            data: document.getElementById('dataEntrega')?.value || '',
+            condicao: document.getElementById('condicaoEntrega')?.value || ''
+        },
+        
+        // Forma de pagamento
+        pagamento: document.getElementById('formaPagamento')?.value || '',
+        
+        // Itens do pedido
+        itens: [],
+        
+        // Observações
+        observacoes: document.getElementById('observacoes')?.value || '',
+        
+        // Valor total
+        valorTotal: formState.valorTotal
+    };
+    
+    // Coletar itens
+    const itensElements = document.querySelectorAll('.item-pedido');
+    itensElements.forEach((itemElement, index) => {
+        const item = {
+            numero: index + 1,
+            produto: itemElement.querySelector('.produto-input')?.value || '',
+            promocao: itemElement.querySelector('input[name^="promocao"]:checked')?.value || 'nao',
+            quantidade: parseInt(itemElement.querySelector('.quantidade-input')?.value) || 0,
+            peso: itemElement.querySelector('.peso-input')?.value || '',
+            precoUnitario: itemElement.querySelector('.preco-input')?.value || '',
+            valorTotal: itemElement.querySelector('.valor-total-item')?.value || ''
+        };
+        dados.itens.push(item);
+    });
+    
+    return dados;
+}
+
+// Inicializar quando o DOM estiver carregado
+document.addEventListener('DOMContentLoaded', initializeForm);
 

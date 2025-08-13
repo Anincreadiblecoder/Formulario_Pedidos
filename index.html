@@ -52,10 +52,22 @@
                 
                 <div class="form-group">
                     <label for="nomeCliente">Nome completo do cliente: <span class="required">*</span></label>
-                    <select id="nomeCliente" name="nomeCliente" required>
-                        <option value="">Selecione um cliente</option>
-                        <!-- Opções serão carregadas via JavaScript -->
-                    </select>
+                    <div class="combobox-container" id="clienteCombobox">
+                        <input type="text" 
+                               id="nomeCliente" 
+                               name="nomeCliente" 
+                               class="combobox-input" 
+                               placeholder="Digite para pesquisar cliente..." 
+                               autocomplete="off"
+                               required>
+                        <button type="button" class="combobox-toggle" aria-label="Mostrar opções">
+                            <span class="arrow-down">▼</span>
+                        </button>
+                        <ul class="combobox-dropdown" id="clienteDropdown" role="listbox" aria-hidden="true">
+                            <!-- Opções serão carregadas via JavaScript -->
+                        </ul>
+                    </div>
+                    <small class="help-text">Digite parte do nome para pesquisar ou selecione da lista</small>
                 </div>
 
                 <div class="form-group">
@@ -93,10 +105,21 @@
 
                 <div class="form-group" id="lojaRetiradaGroup" style="display: none;">
                     <label for="lojaRetirada">Loja para retirada:</label>
-                    <select id="lojaRetirada" name="lojaRetirada">
-                        <option value="">Selecione uma loja</option>
-                        <!-- Opções serão carregadas via JavaScript -->
-                    </select>
+                    <div class="combobox-container" id="lojaCombobox">
+                        <input type="text" 
+                               id="lojaRetirada" 
+                               name="lojaRetirada" 
+                               class="combobox-input" 
+                               placeholder="Digite para pesquisar loja..." 
+                               autocomplete="off">
+                        <button type="button" class="combobox-toggle" aria-label="Mostrar opções">
+                            <span class="arrow-down">▼</span>
+                        </button>
+                        <ul class="combobox-dropdown" id="lojaDropdown" role="listbox" aria-hidden="true">
+                            <!-- Opções serão carregadas via JavaScript -->
+                        </ul>
+                    </div>
+                    <small class="help-text">Digite parte do nome para pesquisar ou selecione da lista</small>
                 </div>
 
                 <div class="form-group">
@@ -176,10 +199,20 @@
             <div class="form-row">
                 <div class="form-group">
                     <label>Nome do Produto: <span class="required">*</span></label>
-                    <select class="produto-select" required>
-                        <option value="">Selecione um produto</option>
-                        <!-- Opções serão carregadas via JavaScript -->
-                    </select>
+                    <div class="combobox-container produto-combobox">
+                        <input type="text" 
+                               class="combobox-input produto-input" 
+                               placeholder="Digite para pesquisar produto..." 
+                               autocomplete="off"
+                               required>
+                        <button type="button" class="combobox-toggle" aria-label="Mostrar opções">
+                            <span class="arrow-down">▼</span>
+                        </button>
+                        <ul class="combobox-dropdown produto-dropdown" role="listbox" aria-hidden="true">
+                            <!-- Opções serão carregadas via JavaScript -->
+                        </ul>
+                    </div>
+                    <small class="help-text">Digite parte do nome para pesquisar ou selecione da lista</small>
                 </div>
 
                 <div class="form-group">
@@ -219,6 +252,7 @@
         </div>
     </template>
 
+    <script src="combobox.js"></script>
     <script src="script_api.js"></script>
 </body>
 </html>
