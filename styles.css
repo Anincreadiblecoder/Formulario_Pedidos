@@ -380,7 +380,7 @@ input[readonly] {
     border-radius: 6px;
     font-weight: 500;
     transition: all 0.3s ease;
-    background: white;
+    background: #764ba2;
 }
 
 .nav-link:hover {
