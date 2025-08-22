@@ -1,0 +1,172 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pesquisar Pedidos - Sistema de Pedidos</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="pesquisa_styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Cabeçalho -->
+        <header class="search-header">
+            <h1>🔍 Pesquisar Pedidos</h1>
+            <p>Encontre pedidos realizados por alunos usando os filtros abaixo</p>
+            <nav class="header-nav">
+                <a href="index.html" class="nav-link">← Voltar ao Formulário</a>
+                <a href="#" id="btn-exportar" class="nav-link export-btn">📊 Exportar Resultados</a>
+            </nav>
+        </header>
+
+        <!-- Seção de Filtros -->
+        <section class="search-filters">
+            <h2>Filtros de Pesquisa</h2>
+            
+            <div class="filters-grid">
+                <div class="form-group">
+                    <label for="filtro-nome-aluno">Nome do Aluno:</label>
+                    <input type="text" id="filtro-nome-aluno" placeholder="Digite parte do nome do aluno...">
+                    <small class="help-text">Busca parcial - digite qualquer parte do nome</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="filtro-id-pedido">ID do Pedido:</label>
+                    <input type="text" id="filtro-id-pedido" placeholder="Ex: PED_20250813_001">
+                    <small class="help-text">Busca exata pelo identificador do pedido</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="filtro-data-inicio">Data Início:</label>
+                    <input type="date" id="filtro-data-inicio">
+                </div>
+
+                <div class="form-group">
+                    <label for="filtro-data-fim">Data Fim:</label>
+                    <input type="date" id="filtro-data-fim">
+                </div>
+            </div>
+
+            <div class="filter-actions">
+                <button type="button" id="btn-pesquisar" class="btn-primary">🔍 Pesquisar</button>
+                <button type="button" id="btn-limpar-filtros" class="btn-secondary">🗑️ Limpar Filtros</button>
+                <div class="quick-filters">
+                    <button type="button" class="btn-quick" data-periodo="hoje">Hoje</button>
+                    <button type="button" class="btn-quick" data-periodo="semana">Esta Semana</button>
+                    <button type="button" class="btn-quick" data-periodo="mes">Este Mês</button>
+                </div>
+            </div>
+        </section>
+
+        <!-- Estatísticas Rápidas -->
+        <section class="stats-section" id="stats-section" style="display: none;">
+            <h3>📈 Estatísticas</h3>
+            <div class="stats-grid">
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-total-pedidos">0</span>
+                    <span class="stat-label">Total de Pedidos</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-valor-total">R$ 0,00</span>
+                    <span class="stat-label">Valor Total</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-pedidos-hoje">0</span>
+                    <span class="stat-label">Pedidos Hoje</span>
+                </div>
+                <div class="stat-card">
+                    <span class="stat-number" id="stat-ultimo-pedido">-</span>
+                    <span class="stat-label">Último Pedido</span>
+                </div>
+            </div>
+        </section>
+
+        <!-- Resultados da Pesquisa -->
+        <section class="search-results" id="search-results" style="display: none;">
+            <div class="results-header">
+                <h3>📋 Resultados da Pesquisa</h3>
+                <div class="results-info">
+                    <span id="results-count">0 pedidos encontrados</span>
+                    <div class="results-actions">
+                        <button type="button" id="btn-exportar-resultados" class="btn-export">📊 Exportar para Excel</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading -->
+            <div id="loading" class="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Pesquisando pedidos...</p>
+            </div>
+
+            <!-- Tabela de Resultados -->
+            <div class="table-container">
+                <table id="results-table" class="results-table">
+                    <thead>
+                        <tr>
+                            <th>Data/Hora</th>
+                            <th>ID Pedido</th>
+                            <th>Aluno</th>
+                            <th>Sala</th>
+                            <th>Cliente</th>
+                            <th>Valor Total</th>
+                            <th>Loja de Retirada</th>
+                            <th>Pagamento</th>
+                            <th>Ações</th>
+                        </tr>
+                    </thead>
+                    <tbody id="results-tbody">
+                        <!-- Resultados serão inseridos aqui via JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+
+            <!-- Paginação -->
+            <div class="pagination" id="pagination" style="display: none;">
+                <button type="button" id="btn-prev-page" class="btn-page">← Anterior</button>
+                <span id="page-info">Página 1 de 1</span>
+                <button type="button" id="btn-next-page" class="btn-page">Próxima →</button>
+            </div>
+        </section>
+
+        <!-- Modal de Detalhes do Pedido -->
+        <div id="modal-detalhes" class="modal" style="display: none;">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h3>📄 Detalhes do Pedido</h3>
+                    <button type="button" class="btn-close" id="btn-fechar-modal">×</button>
+                </div>
+                <div class="modal-body" id="modal-body">
+                    <!-- Detalhes do pedido serão inseridos aqui -->
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn-secondary" id="btn-fechar-modal-footer">Fechar</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- Mensagens -->
+        <div id="message-container" class="message-container"></div>
+    </div>
+
+    <!-- Template para linha da tabela -->
+    <template id="row-template">
+        <tr class="result-row">
+            <td class="data-pedido"></td>
+            <td class="id-pedido"></td>
+            <td class="nome-aluno"></td>
+            <td class="sala-aluno"></td>
+            <td class="nome-cliente"></td>
+            <td class="valor-total"></td>
+            <td class="loja-retirada"></td>
+            <td class="forma-pagamento"></td>
+            <td class="acoes">
+                <button type="button" class="btn-detalhes" data-pedido-id="">👁️ Ver Detalhes</button>
+            </td>
+        </tr>
+    </template>
+
+    <script src="pesquisa_pedidos.js"></script>
+</body>
+</html>
+

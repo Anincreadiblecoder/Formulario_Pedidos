@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Formulário de Pedidos</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <!-- Navegação entre seções -->
+        <div class="section-nav">
+            <button id="btn-fazer-pedido" class="nav-btn active">Fazer Pedido</button>
+            <button id="btn-pesquisar-pedidos" class="nav-btn">Pesquisar Pedidos</button>
+        </div>
+
+        <!-- Seção: Fazer Pedido -->
+        <div id="secao-fazer-pedido" class="main-section active">
+            <header>
+                <h1>Formulário de Pedidos</h1>
+                <p>Preencha todos os campos obrigatórios para processar seu pedido.</p>
+                <nav class="header-nav">
+                    <a href="pesquisar_pedidos.html" class="nav-link">🔍 Pesquisar Pedidos</a>
+                </nav>
+            </header>
+
+        <form id="pedidoForm">
+            <!-- Seção: Informações do Aluno -->
+            <section class="form-section">
+                <h2>Informações do Aluno</h2>
+                
+                <div class="form-group">
+                    <label for="salaAluno">Sala do Aluno:</label>
+                    <div class="combobox-container" id="salaAlunoCombobox">
+                        <input type="text" id="salaAluno" name="salaAluno" class="combobox-input" placeholder="Digite para pesquisar sala..." autocomplete="off">
+                        <button type="button" class="combobox-toggle">▼</button>
+                        <ul class="combobox-dropdown" id="salaAlunoDropdown" role="listbox" aria-hidden="true">
+                            <!-- Opções serão carregadas via JavaScript -->
+                        </ul>
+                    </div>
+                    <small class="help-text">Digite parte da sala para pesquisar ou selecione da lista</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="nomeAluno">Nome completo do aluno:</label>
+                    <div class="combobox-container" id="nomeAlunoCombobox">
+                        <input type="text" id="nomeAluno" name="nomeAluno" class="combobox-input" placeholder="Digite para pesquisar aluno..." autocomplete="off">
+                        <button type="button" class="combobox-toggle">▼</button>
+                        <ul class="combobox-dropdown" id="nomeAlunoDropdown" role="listbox" aria-hidden="true">
+                            <!-- Opções serão carregadas via JavaScript -->
+                        </ul>
+                    </div>
+                    <small class="help-text">Digite parte do nome para pesquisar ou selecione da lista</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="emailAluno">Email escolar do aluno:</label>
+                    <input type="email" id="emailAluno" name="emailAluno" readonly disabled>
+                    <small class="help-text">Preenchido automaticamente com base no aluno selecionado</small>
+                </div>
+            </section>
+
+            <!-- Seção: Informações do Cliente -->
+            <section class="form-section">
+                <h2>Informações do Cliente</h2>
+                
+                <div class="form-group">
+                    <label for="nomeCliente">Nome completo do cliente: <span class="required">*</span></label>
+                    <div class="combobox-container" id="clienteCombobox">
+                        <input type="text" 
+                               id="nomeCliente" 
+                               name="nomeCliente" 
+                               class="combobox-input" 
+                               placeholder="Digite para pesquisar cliente..." 
+                               autocomplete="off"
+                               required>
+                        <button type="button" class="combobox-toggle" aria-label="Mostrar opções">
+                            <span class="arrow-down">▼</span>
+                        </button>
+                        <ul class="combobox-dropdown" id="clienteDropdown" role="listbox" aria-hidden="true">
+                            <!-- Opções serão carregadas via JavaScript -->
+                        </ul>
+                    </div>
+                    <small class="help-text">Digite parte do nome para pesquisar ou selecione da lista</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="emailCliente">Email do cliente: <span class="required">*</span></label>
+                    <input type="email" id="emailCliente" name="emailCliente" readonly required>
+                    <small class="help-text">Preenchido automaticamente com base no cliente selecionado</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="cpfCliente">CPF do cliente (apenas números): <span class="required">*</span></label>
+                    <input type="text" id="cpfCliente" name="cpfCliente" maxlength="11" readonly required>
+                    <small class="help-text">Preenchido automaticamente com base no cliente selecionado</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="telefoneCliente">Telefone/WhatsApp do cliente: <span class="required">*</span></label>
+                    <input type="tel" id="telefoneCliente" name="telefoneCliente" readonly required>
+                    <small class="help-text">Preenchido automaticamente com base no CPF do cliente</small>
+                </div>
+            </section>
+
+            <!-- Seção: Informações de Entrega -->
+            <section class="form-section">
+                <h2>Informações de Entrega</h2>
+                
+                <div class="form-group">
+                    <label for="tipoEntrega">Entrega: <span class="required">*</span></label>
+                    <select id="tipoEntrega" name="tipoEntrega" required>
+                        <option value="">Selecione o tipo de entrega</option>
+                        <option value="entrega_casa">Entrega em Casa</option>
+                        <option value="retirada_outras_lojas">Retirada - Outras Lojas</option>
+                        <option value="retirada_mercado_jf">Retirada - Mercado J&F</option>
+                    </select>
+                </div>
+
+                <div class="form-group" id="lojaRetiradaGroup" style="display: none;">
+                    <label for="lojaRetirada">Loja para retirada:</label>
+                    <div class="combobox-container" id="lojaCombobox">
+                        <input type="text" 
+                               id="lojaRetirada" 
+                               name="lojaRetirada" 
+                               class="combobox-input" 
+                               placeholder="Digite para pesquisar loja..." 
+                               autocomplete="off">
+                        <button type="button" class="combobox-toggle" aria-label="Mostrar opções">
+                            <span class="arrow-down">▼</span>
+                        </button>
+                        <ul class="combobox-dropdown" id="lojaDropdown" role="listbox" aria-hidden="true">
+                            <!-- Opções serão carregadas via JavaScript -->
+                        </ul>
+                    </div>
+                    <small class="help-text">Digite parte do nome para pesquisar ou selecione da lista</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="enderecoCompleto">Endereço completo:</label>
+                    <textarea id="enderecoCompleto" name="enderecoCompleto" rows="3" readonly></textarea>
+                    <small class="help-text">Preenchido automaticamente com base no CPF do cliente</small>
+                </div>
+
+                <div class="form-group">
+                    <label for="dataEntrega">Data de entrega:</label>
+                    <input type="date" id="dataEntrega" name="dataEntrega">
+                </div>
+
+                <div class="form-group">
+                    <label for="condicaoEntrega">Condição de entrega/frete:</label>
+                    <input type="text" id="condicaoEntrega" name="condicaoEntrega" readonly>
+                </div>
+            </section>
+
+            <!-- Seção: Forma de Pagamento -->
+            <section class="form-section">
+                <h2>Forma de Pagamento</h2>
+                
+                <div class="form-group">
+                    <label for="formaPagamento">Forma de pagamento: <span class="required">*</span></label>
+                    <select id="formaPagamento" name="formaPagamento" required>
+                        <option value="">Selecione a forma de pagamento</option>
+                        <option value="pix">Pix</option>
+                        <option value="cartao_credito">Cartão de crédito</option>
+                        <option value="picpay">PicPay</option>
+                    </select>
+                </div>
+            </section>
+
+            <!-- Seção: Itens do Pedido -->
+            <section class="form-section">
+                <h2>Itens do Pedido</h2>
+                
+                <div id="itensContainer">
+                    <!-- Itens serão adicionados dinamicamente aqui -->
+                </div>
+
+                <button type="button" id="adicionarItem" class="btn-secondary">+ Adicionar Item</button>
+                
+                <div class="form-group total-section">
+                    <label for="valorTotalPedido">Valor Total do Pedido:</label>
+                    <input type="text" id="valorTotalPedido" name="valorTotalPedido" readonly>
+                </div>
+            </section>
+
+            <!-- Seção: Observações -->
+            <section class="form-section">
+                <h2>Observações Adicionais</h2>
+                
+                <div class="form-group">
+                    <label for="observacoes">Observações:</label>
+                    <textarea id="observacoes" name="observacoes" rows="4" placeholder="Digite aqui qualquer observação adicional sobre o pedido..."></textarea>
+                </div>
+            </section>
+
+            <!-- Botões de Ação -->
+            <div class="form-actions">
+                <button type="button" id="limparForm" class="btn-secondary">Limpar Formulário</button>
+                <button type="submit" id="enviarPedido" class="btn-primary">Enviar Pedido</button>
+            </div>
+        </form>
+
+        <!-- Área de Mensagens -->
+        <div id="mensagens" class="messages-area"></div>
+    </div>
+
+    <!-- Template para Item do Pedido -->
+    <template id="itemTemplate">
+        <div class="item-pedido">
+            <h3>Item <span class="item-numero"></span></h3>
+            
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Nome do Produto: <span class="required">*</span></label>
+                    <div class="combobox-container produto-combobox">
+                        <input type="text" 
+                               class="combobox-input produto-input" 
+                               placeholder="Digite para pesquisar produto..." 
+                               autocomplete="off"
+                               required>
+                        <button type="button" class="combobox-toggle" aria-label="Mostrar opções">
+                            <span class="arrow-down">▼</span>
+                        </button>
+                        <ul class="combobox-dropdown produto-dropdown" role="listbox" aria-hidden="true">
+                            <!-- Opções serão carregadas via JavaScript -->
+                        </ul>
+                    </div>
+                    <small class="help-text">Digite parte do nome para pesquisar ou selecione da lista</small>
+                </div>
+
+                <div class="form-group">
+                    <label>Há promoção?</label>
+                    <div class="radio-group">
+                        <label><input type="radio" name="promocao" value="sim"> Sim</label>
+                        <label><input type="radio" name="promocao" value="nao" checked> Não</label>
+                    </div>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Quantidade: <span class="required">*</span></label>
+                    <input type="number" class="quantidade-input" min="1" required>
+                </div>
+
+                <div class="form-group">
+                    <label>Peso:</label>
+                    <input type="text" class="peso-input" readonly>
+                </div>
+            </div>
+
+            <div class="form-row">
+                <div class="form-group">
+                    <label>Preço Unitário:</label>
+                    <input type="text" class="preco-input" readonly>
+                </div>
+
+                <div class="form-group">
+                    <label>Valor Total do Item:</label>
+                    <input type="text" class="valor-total-item" readonly>
+                </div>
+            </div>
+
+            <button type="button" class="btn-remove">Remover Item</button>
+        </div>
+    </template>
+
+    <script src="combobox.js"></script>
+    <script src="script_api.js"></script>
+</body>
+</html>
+
